@@ -18,10 +18,10 @@ import {CommonModule, Location, LocationStrategy, PathLocationStrategy} from '@a
   ],
   providers: [
     Location,
-    { provide: LocationStrategy, useClass: PathLocationStrategy },
+    {provide: LocationStrategy, useClass: PathLocationStrategy},
     {
       provide: 'SpotifyConfig', useValue: {
-        clientId: '<spotify-client-id>',
+        clientId: '2795bb21968a4fa48a2b83b90ff15e4c',
         redirectUri: 'http://localhost:4200/',
         scope: 'user-follow-modify user-follow-read playlist-read-private playlist-read-collaborative playlist-modify-public playlist-modify-private user-library-read user-library-modify user-read-private'
       }

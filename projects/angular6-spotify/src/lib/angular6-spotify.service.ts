@@ -1,40 +1,11 @@
 import {Inject, Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams, HttpRequest} from '@angular/common/http';
-import {from} from 'rxjs';
 import {DefaultUrlSerializer, UrlTree} from '@angular/router';
+import {from} from 'rxjs';
 
-export interface SpotifyConfig {
-  clientId: string;
-  redirectUri: string;
-  scope: string;
-  authToken?: string;
-  apiBase: string;
-}
-
-export interface SpotifyOptions {
-  limit?: number;
-  offset?: number;
-  market?: string;
-  album_type?: string;
-  country?: string;
-  type?: string;
-  q?: string;
-  timestamp?: string
-  locale?: string;
-  public?: boolean;
-  name?: string;
-  time_range?: string;
-  after?: string;
-  before?: string;
-}
-
-interface HttpRequestOptions {
-  method?: string;
-  url: string;
-  search?: Object;
-  body?: Object;
-  headers?: HttpHeaders;
-}
+import {SpotifyConfig} from './shared/spotify-config.interface';
+import {SpotifyOptions} from './shared/spotify-options.interface';
+import {HttpRequestOptions} from './shared/http-request-options.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -44,6 +15,8 @@ export class Angular6SpotifyService {
   constructor(@Inject('SpotifyConfig') private config: SpotifyConfig, private http: HttpClient) {
     config.apiBase = 'https://api.spotify.com/v1';
   }
+
+  /* Public Data */
 
   getArtists(artists: string | Array<string>) {
     const artistList = this.mountItemList(artists);
@@ -87,6 +60,9 @@ export class Angular6SpotifyService {
 
   /* Authentication */
 
+  /**
+   * Open Spotify OAuth in separate Dialog
+   */
   loginDialog() {
     const promise = new Promise((resolve, reject) => {
       const w = 400,
@@ -132,6 +108,9 @@ export class Angular6SpotifyService {
     return from(promise);
   }
 
+  /**
+   * Open Spotify OAuth through redirect
+   */
   login() {
     const promise = new Promise((resolve, reject) => {
       const params = {
@@ -162,6 +141,10 @@ export class Angular6SpotifyService {
 
   /* Helper Functions */
 
+  /**
+   * Set auth token from url callback path
+   * @param path url callback path
+   */
   setAuthFromUrlCallback(path) {
     const serializer = new DefaultUrlSerializer();
     const urlObj: UrlTree = serializer.parse(this.convertHashToQueryParams(path));
@@ -179,6 +162,10 @@ export class Angular6SpotifyService {
 
   /* Private */
 
+  /**
+   * Extract id from uri
+   * @param uri string containing the id param
+   */
   private getIdFromUri(uri: string) {
     return uri.indexOf('spotify:') === -1 ? uri : uri.split(':')[2];
   }
@@ -191,6 +178,11 @@ export class Angular6SpotifyService {
     return itemList;
   }
 
+  /**
+   * Convert key value pair object to HttpParams
+   * @param obj key value pair object
+   * @return HttpParams
+   */
   private toParams(obj: Object): HttpParams {
     const params: HttpParams = new HttpParams();
     for (const key in obj) {
@@ -211,6 +203,10 @@ export class Angular6SpotifyService {
     }));
   }
 
+  /**
+   * Create header object excpected by Spotify api
+   * @param isJson include json content type header
+   */
   private auth(isJson?: boolean): Object {
     const auth = {
       'Authorization': 'Bearer ' + this.config.authToken
@@ -235,6 +231,13 @@ export class Angular6SpotifyService {
     return headers;
   }
 
+  /**
+   * Use window to open a dialog
+   * @param uri uri to navigate to
+   * @param name dialog name
+   * @param options dialog specific config options
+   * @param cb other
+   */
   private openDialog(uri, name, options, cb) {
     const win = window.open(uri, name, options);
     const interval = window.setInterval(() => {
@@ -253,6 +256,11 @@ export class Angular6SpotifyService {
     window.location.href = 'https://accounts.spotify.com/authorize?' + this.toQueryString(params);
   }
 
+  /**
+   * Convert key value pair object to query string
+   * @param obj key value pair object
+   * @return string
+   */
   private toQueryString(obj: Object): string {
     const parts = [];
     for (const key in obj) {
@@ -263,6 +271,11 @@ export class Angular6SpotifyService {
     return parts.join('&');
   }
 
+  /**
+   * Convert hash returned by callback to query params so that the returned parameters are more easily accessible
+   * @param hashUrl url hash string
+   * @return string
+   */
   private convertHashToQueryParams(hashUrl): string {
     const re = /#/g;
     return hashUrl.replace(re, '?');
