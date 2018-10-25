@@ -191,6 +191,112 @@ export class Angular6SpotifyService {
     });
   }
 
+  /* Follow */
+
+  /**
+   * Get the current user’s followed artists.
+   * @param type the ID type (currently only artist supported)
+   * @param options search options
+   */
+  following(type: string, options?: SpotifyOptions) {
+    options = options || {};
+    options.type = type;
+    return this.api({
+      method: 'get',
+      url: `/me/following`,
+      search: options,
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Add the current user as a follower of one or more artists or other Spotify users.
+   * @param type The ID type: either artist or user.
+   * @param ids artist or user IDs
+   */
+  follow(type: string, ids: string | Array<string>) {
+    return this.api({
+      method: 'put',
+      url: `/me/following`,
+      search: { type: type, ids: ids.toString() },
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Remove the current user as a follower of one or more artists or other Spotify users
+   * @param type The ID type: either artist or user.
+   * @param ids artist or user IDs
+   */
+  unfollow(type: string, ids: string | Array<string>) {
+    return this.api({
+      method: 'delete',
+      url: `/me/following`,
+      search: { type: type, ids: ids.toString() },
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Check to see if the current user is following one or more artists or other Spotify users.
+   * @param type The ID type: either artist or user.
+   * @param ids artist or user IDs
+   */
+  userFollowingContains(type: string, ids: string | Array<string>) {
+    return this.api({
+      method: 'get',
+      url: `/me/following/contains`,
+      search: { type: type, ids: ids.toString() },
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Add the current user as a follower of a playlist.
+   * @param userId id of user who owns playlist
+   * @param playlistId id of playlist to follow
+   * @param isPublic Defaults to true. If true the playlist will be included in user’s public playlists, if false it will remain private.
+   *
+   */
+  followPlaylist(userId: string, playlistId: string, isPublic?: boolean) {
+    // Note: playlist-modify-private scope required if isPublic set to false.
+    return this.api({
+      method: 'put',
+      url: `/users/${userId}/playlists/${playlistId}/followers`,
+      body: { public: !!isPublic },
+      headers: this.getHeaders(true)
+    });
+  }
+
+  /**
+   * Remove the current user as a follower of a playlist.
+   * @param userId id of user who owns playlist
+   * @param playlistId The Spotify ID of the playlist that is to be no longer followed.
+   */
+  unfollowPlaylist(userId: string, playlistId: string) {
+    return this.api({
+      method: 'delete',
+      url: `/users/${userId}/playlists/${playlistId}/followers`,
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Check to see if one or more Spotify users are following a specified playlist.
+   * @param userId id of user who owns playlist
+   * @param playlistId The Spotify ID of the playlist.
+   * @param ids the ids of the users that you want to check to see if they follow the playlist. Max 5
+   */
+  playlistFollowingContains(userId: string, playlistId: string, ids: string | Array<string>) {
+    return this.api({
+      method: 'get',
+      url: `/users/${userId}/playlists/${playlistId}/followers/contains`,
+      search: { ids: ids.toString() },
+      headers: this.getHeaders()
+    });
+  }
+
+
   /* User Specific */
 
   getSavedUserTracks() {
