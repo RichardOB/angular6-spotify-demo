@@ -191,6 +191,85 @@ export class Angular6SpotifyService {
     });
   }
 
+  /**
+   * Get albums for a specific artist
+   * @param artist id of artist
+   * @param options search options
+   */
+  getArtistAlbums(artist: string, options?: SpotifyOptions) {
+    artist = this.getIdFromUri(artist);
+    return this.api({
+      method: 'get',
+      url: `/artists/${artist}/albums`,
+      search: options
+    });
+  }
+
+  /**
+   * Get list of top tracks for artist
+   * @param artist id of artist
+   * @param country origin country
+   */
+  getArtistTopTracks(artist: string, country: string) {
+    artist = this.getIdFromUri(artist);
+    return this.api({
+      method: 'get',
+      url: `/artists/${artist}/top-tracks`,
+      search: { country: country }
+    }).map(res => res.json());
+  }
+
+  /**
+   * Get list of related artists
+   * @param artist id of artist
+   */
+  getRelatedArtists(artist: string) {
+    artist = this.getIdFromUri(artist);
+    return this.api({
+      method: 'get',
+      url: `/artists/${artist}/related-artists`
+    });
+  }
+
+  /**
+   * Get album by album id
+   * @param album id of album
+   */
+  getAlbum(album: string) {
+    album = this.getIdFromUri(album);
+    return this.api({
+      method: 'get',
+      url: `/albums/${album}`
+    });
+  }
+
+  /**
+   * Get albums by album id array
+   * @param albums id of album(s)
+   */
+  getAlbums(albums: string | Array<string>) {
+    const albumList = this.mountItemList(albums);
+    return this.api({
+      method: 'get',
+      url: `/albums`,
+      search: { ids: albumList.toString() }
+    });
+  }
+
+  /**
+   * Get tracks for specific album
+   * @param album id of album
+   * @param options search options
+   */
+  getAlbumTracks(album: string, options?: SpotifyOptions) {
+    album = this.getIdFromUri(album);
+    return this.api({
+      method: 'get',
+      url: `/albums/${album}/tracks`,
+      search: options
+    });
+  }
+
   /* User Specific */
 
   getSavedUserTracks() {
