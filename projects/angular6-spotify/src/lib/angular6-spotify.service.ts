@@ -57,6 +57,165 @@ export class Angular6SpotifyService {
       method: 'get',
       url: `/artists/${artist}/top-tracks`,
       search: { country: country }
+    });
+  }
+
+  /**
+   * Get list of related artists
+   * @param artist id of artist
+   */
+  getRelatedArtists(artist: string) {
+    artist = this.getIdFromUri(artist);
+    return this.api({
+      method: 'get',
+      url: `/artists/${artist}/related-artists`
+    });
+  }
+
+  /**
+   * Get album by album id
+   * @param album id of album
+   */
+  getAlbum(album: string) {
+    album = this.getIdFromUri(album);
+    return this.api({
+      method: 'get',
+      url: `/albums/${album}`
+    });
+  }
+
+  /**
+   * Get albums by album id array
+   * @param albums id of album(s)
+   */
+  getAlbums(albums: string | Array<string>) {
+    const albumList = this.mountItemList(albums);
+    return this.api({
+      method: 'get',
+      url: `/albums`,
+      search: { ids: albumList.toString() }
+    });
+  }
+
+  /**
+   * Get tracks for specific album
+   * @param album id of album
+   * @param options search options
+   */
+  getAlbumTracks(album: string, options?: SpotifyOptions) {
+    album = this.getIdFromUri(album);
+    return this.api({
+      method: 'get',
+      url: `/albums/${album}/tracks`,
+      search: options
+    });
+  }
+
+  /* Public Generic Data */
+
+  /**
+   * Get latest releases based on search options
+   * @param options search options
+   */
+  getNewReleases(options?: SpotifyOptions) {
+    return this.api({
+      method: 'get',
+      url: `/browse/new-releases`,
+      search: options,
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Get categories based on search options
+   * @param options search options
+   */
+  getCategories(options?: SpotifyOptions) {
+    return this.api({
+      method: 'get',
+      url: `/browse/categories`,
+      search: options,
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Get category by id and search options
+   * @param categoryId id of category
+   * @param options search options
+   */
+  getCategory(categoryId: string, options?: SpotifyOptions) {
+    return this.api({
+      method: 'get',
+      url: `/browse/categories/${categoryId}`,
+      search: options,
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Get playlists matching category id
+   * @param categoryId id of category
+   * @param options search options
+   */
+  getCategoryPlaylists(categoryId: string, options?: SpotifyOptions) {
+    return this.api({
+      method: 'get',
+      url: `/browse/categories/${categoryId}/playlists`,
+      search: options,
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Get recommendations based on search options
+   * @param options search options
+   */
+  getRecommendations(options?: SpotifyOptions) {
+    return this.api({
+      method: 'get',
+      url: `/recommendations`,
+      search: options,
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Get available genre seeds
+   */
+  getAvailableGenreSeeds () {
+    return this.api({
+      method: 'get',
+      url: `/recommendations/available-genre-seeds`,
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Get albums for a specific artist
+   * @param artist id of artist
+   * @param options search options
+   */
+  getArtistAlbums(artist: string, options?: SpotifyOptions) {
+    artist = this.getIdFromUri(artist);
+    return this.api({
+      method: 'get',
+      url: `/artists/${artist}/albums`,
+      search: options
+    });
+  }
+
+  /**
+   * Get list of top tracks for artist
+   * @param artist id of artist
+   * @param country origin country
+   */
+  getArtistTopTracks(artist: string, country: string) {
+    artist = this.getIdFromUri(artist);
+    return this.api({
+      method: 'get',
+      url: `/artists/${artist}/top-tracks`,
+      search: { country: country }
     }).map(res => res.json());
   }
 
